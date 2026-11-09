@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Seminário de Práticas de Ensino de Matemática III (UFABC): a influência do El Niño nas bacias hidrográficas brasileiras, com diagrama, gráficos e missões interativas.">
+<title>A Matemática do El Niño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800&family=Figtree:ital,wght@0,300;0,400;0,600;0,700;1,600;1,700&family=Cormorant+Garamond:wght@500&family=Anton&display=swap">
+<style>
+/* Layout: a página rolável segue o visual dos slides do grupo. Fundo branco com retícula de
+   pontos verdes, títulos enormes em League Spartan que vazam pelas bordas (preto à esquerda,
+   azul à direita), a Terra de musgo no anel de papel rasgado sobre um painel azul com ondas,
+   cartões cinza com bolinha azul e folhas soltas. Tema claro único, como nos slides. */
+:root{
+  --ink:#231f20; --text:#3b3b3b; --mut:#686868; --white:#ffffff;
+  --blue:#0b7fc4; --blue-deep:#08679f; --wave:#8ccaf0; --card:#e8e8e8; --card-2:#f2f2f2;
+  --dot:#7d9b4e; --leaf:#5c9e2e; --hi:#fff100; --amber:#c98a00;
+  --f-title:"League Spartan","Montserrat","Arial Black",sans-serif;
+  --f-body:"Figtree","Proxima Nova","Segoe UI",system-ui,sans-serif;
+  --f-serif:"Cormorant Garamond","Cormorant",Georgia,serif;
+  --f-thanks:"Anton","Norwester","Impact",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--white);color:var(--text);font:300 18px/1.55 var(--f-body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+b,strong{font-weight:600;color:var(--ink)}
+img{max-width:100%;display:block}
+:where(a,button,input,[tabindex]):focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));position:relative}
+section{position:relative;overflow:hidden}
+.pad{padding-block:clamp(64px,9vw,120px)}
+
+/* retícula de pontos verdes, como nos cantos dos slides */
+.dots{position:absolute;pointer-events:none;background-image:radial-gradient(circle,var(--dot) 1.6px,transparent 2px);background-size:18px 18px;opacity:.75}
+.dots.tr{top:0;right:0;width:46%;height:420px;-webkit-mask-image:radial-gradient(ellipse at 100% 0,#000 0,transparent 70%);mask-image:radial-gradient(ellipse at 100% 0,#000 0,transparent 70%)}
+.dots.bl{left:0;bottom:0;width:30%;height:420px;-webkit-mask-image:radial-gradient(ellipse at 0 100%,#000 0,transparent 70%);mask-image:radial-gradient(ellipse at 0 100%,#000 0,transparent 70%)}
+.dots.l{left:0;top:20%;width:22%;height:60%;-webkit-mask-image:radial-gradient(ellipse at 0 50%,#000 0,transparent 70%);mask-image:radial-gradient(ellipse at 0 50%,#000 0,transparent 70%)}
+.dots.gray{background-image:radial-gradient(circle,#555 1.3px,transparent 1.7px)}
+
+/* tipografia dos slides */
+.big{font:800 clamp(52px,10.4vw,168px)/.86 var(--f-title);letter-spacing:-.025em;text-transform:uppercase;color:var(--ink);margin:0;white-space:nowrap}
+.big.blue{color:var(--blue)}
+.h2{font:700 clamp(40px,5.4vw,72px)/1 var(--f-title);letter-spacing:-.02em;color:var(--ink);margin:0 0 14px;text-wrap:balance}
+.h3{font:700 clamp(24px,2.6vw,34px)/1.15 var(--f-body);color:var(--blue);margin:0 0 16px;text-wrap:balance}
+.lead{font-size:clamp(18px,1.7vw,21px);color:var(--text);margin:0 0 20px;max-width:58ch}
+.serif{font:500 clamp(24px,2.6vw,34px)/1.25 var(--f-serif);color:var(--ink)}
+.eyebrow{font:700 14px/1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0 0 14px}
+.em-line{font:italic 600 clamp(17px,1.6vw,20px)/1.5 var(--f-body);color:var(--ink);margin:0}
+
+/* painel azul com ondas */
+.water{position:absolute;background:var(--blue);border-radius:26px;overflow:hidden}
+.water svg{position:absolute;inset:0;width:100%;height:100%}
+.water .w{animation:drift 14s ease-in-out infinite alternate}
+.water .w2{animation-duration:18s;animation-direction:alternate-reverse}
+@keyframes drift{from{transform:translateX(-24px)}to{transform:translateX(24px)}}
+
+/* Terra no anel de papel */
+.globe{position:relative;aspect-ratio:1;max-width:100%}
+.globe .earth{position:absolute;inset:7%;width:86%;height:86%;object-fit:contain;will-change:transform}
+.globe .ring{position:absolute;inset:0;width:100%;height:100%}
+.torn{position:relative;aspect-ratio:1;max-width:100%}
+.torn .in{position:absolute;inset:9%;border-radius:50%;overflow:hidden;background:#111}
+.torn .in img{width:100%;height:100%;object-fit:cover}
+.torn .ring{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* cartão cinza com bolinha azul (slides 5 e 13) */
+.gcard{position:relative;background:var(--card);border-radius:26px;padding:26px 30px 26px 30px;margin-top:14px;min-width:0}
+.gcard::before{content:"";position:absolute;left:-1px;top:-1px;width:70px;height:46px;background:var(--white);border-bottom-right-radius:24px}
+.gcard::after{content:"";position:absolute;left:18px;top:-10px;width:34px;height:34px;border-radius:50%;background:var(--blue)}
+.gcard h4{font:700 21px/1.25 var(--f-body);color:var(--ink);margin:10px 0 6px 52px}
+.gcard p{margin:0;font-size:18px;line-height:1.5}
+.gcard.btn-card{display:block;width:100%;text-align:left;border:0;font:inherit;color:inherit;cursor:pointer;transition:background .2s ease}
+.gcard.btn-card:hover{background:#dfdfdf}
+.gcard.btn-card .more{display:none;margin-top:8px}
+.gcard.btn-card[aria-expanded=true]{background:#dcecf7}
+.gcard.btn-card[aria-expanded=true] .more{display:block}
+.gcard .chev{position:absolute;right:24px;top:24px;font:700 22px/1 var(--f-body);color:var(--blue);transition:transform .2s ease}
+.gcard.btn-card[aria-expanded=true] .chev{transform:rotate(45deg)}
+.photo{border-radius:30px;overflow:hidden;background:var(--card)}
+.photo img{width:100%;height:100%;object-fit:cover}
+.leaf{position:absolute;pointer-events:none;will-change:transform}
+
+/* botões */
+.btn{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:14px 26px;font:700 17px/1 var(--f-body);text-decoration:none;cursor:pointer;background:var(--blue);color:#fff;transition:background .2s ease}
+.btn:hover{background:var(--blue-deep)}
+.btn.ghost{background:var(--white);color:var(--blue);box-shadow:inset 0 0 0 2px var(--blue)}
+.btn.ghost:hover{background:#e7f3fb}
+.seg{display:inline-flex;background:var(--card);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;border-radius:999px;padding:10px 20px;font:600 16px/1.2 var(--f-body);color:var(--text);cursor:pointer;min-height:42px}
+.seg button[aria-pressed=true]{background:var(--blue);color:#fff}
+
+/* ---------- HUD: progresso e navegação ---------- */
+.progress{position:fixed;left:0;right:0;top:0;height:4px;z-index:40;background:transparent}
+.progress i{display:block;height:100%;width:0;background:var(--blue)}
+.sidenav{position:fixed;right:max(14px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:10px}
+.sidenav a{position:relative;display:block;width:12px;height:12px;border-radius:50%;background:#cfcfcf;border:2px solid var(--white);box-shadow:0 0 0 1px #cfcfcf}
+.sidenav a[aria-current=true]{background:var(--blue);box-shadow:0 0 0 1px var(--blue);transform:scale(1.25)}
+.sidenav a span{position:absolute;right:22px;top:50%;transform:translateY(-50%);white-space:nowrap;background:var(--ink);color:#fff;font:600 13px/1 var(--f-body);padding:7px 10px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .15s ease}
+.sidenav a:hover span,.sidenav a:focus-visible span{opacity:1}
+@media (max-width:860px){.sidenav{display:none}}
+
+/* ---------- 1 · CAPA ---------- */
+.hero{min-height:clamp(720px,100vh,920px);padding-top:clamp(40px,6vw,72px)}
+.hero .l1{margin-left:-.06em}
+.hero .l2{text-align:right;margin-right:-.05em;margin-top:clamp(12px,2vw,28px)}
+.team{position:relative;z-index:2;margin:clamp(-60px,-4vw,-20px) 0 0 clamp(20px,6vw,90px);font:300 clamp(16px,1.6vw,21px)/1.45 var(--f-body);color:var(--ink);display:grid;grid-template-columns:auto auto;gap:0 18px;width:max-content;max-width:100%}
+.team b{color:var(--blue);font-weight:700}
+.hero .water{left:5.5%;right:5.5%;top:clamp(440px,48vw,560px);bottom:-30px}
+.hero .globe{position:absolute;left:50%;transform:translateX(-50%);top:clamp(370px,38vw,450px);width:min(64vw,700px);z-index:1}
+.glass{position:absolute;z-index:3;background:rgba(255,255,255,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(0,0,0,.18);border-radius:18px;padding:16px 22px;font:700 clamp(15px,1.4vw,19px)/1.3 var(--f-body);color:var(--ink)}
+.glass hr{border:0;border-top:2px solid #4a5b3e;margin:8px 0}
+.glass .s{font-weight:600;color:#4b4b4b;font-size:.9em}
+.hero .g1{left:8%;top:clamp(600px,58vw,680px)}
+.hero .g2{right:4%;top:clamp(470px,46vw,520px);text-align:center}
+.hero .bubble{position:absolute;right:-60px;bottom:-60px;width:min(30vw,360px);z-index:2;opacity:.9}
+.scroll-cue{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:4;background:var(--white);color:var(--ink);border-radius:999px;padding:10px 18px;font:600 15px/1 var(--f-body);text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.15);display:flex;gap:8px;align-items:center}
+.scroll-cue i{display:inline-block;animation:bob 1.6s ease-in-out infinite;font-style:normal}
+@keyframes bob{50%{transform:translateY(4px)}}
+@media (max-width:760px){
+  .hero{min-height:0;padding-bottom:360px}
+  .team{margin:18px 0 0 0;grid-template-columns:auto auto}
+  .hero .water{top:auto;bottom:-20px;height:300px;left:16px;right:16px}
+  .hero .globe{top:auto;bottom:-150px;width:92vw}
+  .hero .glass{position:relative;left:auto;right:auto;top:auto;bottom:auto;display:inline-block;margin:18px 6px 0 0;vertical-align:top}
+  .hero .g1{margin-left:max(20px,env(safe-area-inset-left,0px))}
+  .hero .big{font-size:9.6vw}.hero .l1{margin-left:max(12px,env(safe-area-inset-left,0px))}
+  .hero .bubble{width:40vw}
+  .scroll-cue{display:none}
+}
+
+/* ---------- divisores (Contextualização, Plano de aula...) ---------- */
+.band{min-height:clamp(560px,72vw,860px);padding-top:clamp(40px,5vw,64px)}
+.band .r1{margin-left:-.05em}
+.band .r2{text-align:right;margin-right:-.04em}
+.band .water{left:5.5%;right:5.5%;bottom:-30px;height:clamp(240px,30vw,400px)}
+.band .globe{position:absolute;left:50%;transform:translateX(-50%);bottom:clamp(-260px,-16vw,-120px);width:min(62vw,620px)}
+.band .bubble{position:absolute;right:-70px;bottom:-60px;width:min(26vw,320px);opacity:.9}
+.band .kicker{position:absolute;z-index:3;left:max(20px,6%);bottom:clamp(40px,6vw,80px);background:rgba(255,255,255,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(0,0,0,.15);border-radius:16px;padding:12px 18px;font:600 16px/1.35 var(--f-body);color:var(--ink);max-width:min(320px,60vw)}
+.band .kicker b{display:block;color:var(--blue);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
+@media (max-width:760px){.band{min-height:520px}.band .big{font-size:8.4vw}.team{margin-left:max(20px,env(safe-area-inset-left,0px))}.band .globe{width:86vw;bottom:-120px}.band .kicker{bottom:auto;top:200px;left:16px}}
+
+/* ---------- 2 · resolução de problemas ---------- */
+.prob{text-align:center}
+.prob .big{font-size:clamp(40px,6.6vw,104px);white-space:normal}
+.cycle{position:relative;max-width:1080px;margin:clamp(30px,5vw,60px) auto 0;display:grid;grid-template-columns:1fr minmax(260px,400px) 1fr;align-items:center;gap:20px}
+.cycle .torn{transition:transform .6s cubic-bezier(.34,1.3,.64,1)}
+.cycle .torn:hover{transform:rotate(-6deg) scale(1.03)}
+.node{border:0;background:transparent;cursor:pointer;font:inherit;color:inherit;padding:12px;border-radius:16px;transition:background .2s ease}
+.node:hover{background:#f3f7fa}
+.node .serif{display:block}
+.node .tip{display:block;max-height:0;overflow:hidden;opacity:0;font-size:16px;line-height:1.45;color:var(--text);transition:max-height .35s ease,opacity .3s ease,margin .3s ease}
+.node[aria-expanded=true] .tip{max-height:200px;opacity:1;margin-top:10px}
+.node .hint{display:block;font:600 13px/1 var(--f-body);color:var(--blue);margin-top:10px;letter-spacing:.04em}
+.node[aria-expanded=true] .hint{display:none}
+.arrow{position:absolute;pointer-events:none;width:22%;height:auto}
+.arrow path{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.arrow .draw{stroke-dasharray:420;stroke-dashoffset:420;transition:stroke-dashoffset 1.2s ease}
+.inview .arrow .draw{stroke-dashoffset:0}
+.periodic{margin:clamp(40px,5vw,64px) auto 0;max-width:820px}
+.periodic .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}
+.periodic label{font:600 16px/1.2 var(--f-body);color:var(--ink)}
+.periodic input{width:min(320px,70vw);accent-color:var(--blue)}
+.periodic svg{width:100%;height:auto;display:block;margin-top:10px}
+@media (max-width:760px){.cycle{grid-template-columns:1fr}.arrow{display:none}.cycle .torn{max-width:280px;margin:0 auto;order:-1}}
+
+/* ---------- 4 · O que é El Niño ---------- */
+.what{display:grid;grid-template-columns:1.25fr .8fr .9fr;gap:24px;align-items:start}
+.what .photo.tall{aspect-ratio:3/4}
+.what .photo.full{aspect-ratio:3/5;grid-row:span 2}
+.hl-list{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin:20px 0 6px}
+.hl{border:0;cursor:pointer;background:var(--hi);color:var(--ink);font:600 clamp(16px,1.5vw,19px)/1.3 var(--f-body);padding:6px 12px;text-align:left;border-radius:2px;box-shadow:0 0 0 0 var(--blue);transition:box-shadow .2s ease}
+.hl:hover{box-shadow:0 0 0 2px var(--ink)}
+.hl[aria-pressed=true]{box-shadow:0 0 0 3px var(--blue)}
+.hl-out{min-height:84px;font-size:17px;color:var(--text);margin:8px 0 0;max-width:46ch}
+.enso{grid-column:1/-1}
+.enso .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0 10px 52px}
+.enso .top h4{margin:0}
+.enso-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:center}
+.ocean{background:var(--white);border-radius:20px;padding:10px}
+.ocean svg{display:block;width:100%;height:auto}
+.ocean .warm,.ocean .cloud,.ocean .cold,.ocean .wind{transition:transform .9s cubic-bezier(.34,1.2,.64,1),opacity .6s ease}
+.ocean .thermo{transition:d .9s ease}
+.enso-panel h5{font:700 30px/1.1 var(--f-title);color:var(--blue);margin:0 0 8px;text-transform:uppercase}
+.enso-panel p{margin:0 0 14px;font-size:18px}
+.eff{display:flex;gap:10px;align-items:baseline;padding:10px 0;border-top:1px solid #d2d2d2;font-size:17px}
+.eff b{min-width:96px}
+.tagp{display:inline-block;border-radius:999px;padding:2px 10px;font:600 14px/1.4 var(--f-body);margin-right:6px}
+.tagp.dry{background:#f1dfc8;color:#7a4a17}.tagp.wet{background:#d4e9f7;color:#06578a}.tagp.neu{background:#fff;color:#555}
+@media (max-width:960px){.what{grid-template-columns:1fr 1fr}.what .intro{grid-column:1/-1}.what .photo.full{grid-row:auto;aspect-ratio:3/4}.enso-grid{grid-template-columns:1fr}}
+@media (max-width:560px){.what{grid-template-columns:1fr}.enso .top{margin-left:0;margin-top:30px}}
+
+/* ---------- ONI ---------- */
+.oni{display:grid;grid-template-columns:1.25fr 1fr;gap:36px;align-items:start}
+.chart-card{background:var(--card-2);border-radius:26px;padding:20px;margin-top:20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:38px;border:0;background:var(--white);border-radius:999px;padding:6px 14px;font:600 15px/1.2 var(--f-body);color:var(--ink);cursor:pointer}
+.chip i{width:12px;height:12px;border-radius:50%;background:var(--c)}
+.chip[aria-pressed=false]{opacity:.45}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.kpi{background:var(--white);border-radius:18px;padding:14px 16px}
+.kpi .v{font:800 clamp(26px,2.8vw,38px)/1 var(--f-title);color:var(--ink);font-variant-numeric:tabular-nums}
+.kpi .v.b{color:var(--blue)}
+.kpi .k{font-size:14px;line-height:1.3;color:var(--mut);margin-top:6px}
+.src{font-size:13px;color:var(--mut);margin-top:10px}
+@media (max-width:960px){.oni{grid-template-columns:1fr}}
+@media (max-width:520px){.kpis{grid-template-columns:1fr}}
+
+/* gráficos */
+.plot{position:relative;min-width:0}
+.plot svg{display:block;width:100%;height:auto;font-family:var(--f-body);touch-action:pan-y}
+.plot .grid{stroke:rgba(0,0,0,.09);stroke-width:1}.plot .grid.zero{stroke:rgba(0,0,0,.35)}
+.plot .ax{font-size:13px;fill:var(--mut);font-variant-numeric:tabular-nums}
+.plot .ref{stroke:#8a8a8a;stroke-width:1.2;stroke-dasharray:5 5}
+.plot .refl{font-size:12.5px;fill:var(--mut);font-weight:600}
+.plot .dl{font-size:13.5px;fill:var(--mut);font-weight:600}.plot .dl.b{fill:var(--blue);font-weight:800}
+.plot .mk{font-size:13px;fill:var(--ink);font-weight:700}
+.plot .an{font-size:13.5px;fill:var(--ink);font-weight:700}
+.plot .cross{stroke:rgba(0,0,0,.35);stroke-width:1}
+.plot .area{opacity:.14}
+.tipbox{position:absolute;top:6px;background:var(--white);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:10px 12px;font-size:14px;line-height:1.4;pointer-events:none;min-width:160px;z-index:3}
+.tipbox .th{font-weight:700;color:var(--ink);margin-bottom:4px}
+.tipbox .tr{display:flex;gap:12px;justify-content:space-between;font-variant-numeric:tabular-nums}
+.tipbox .tr span{display:inline-flex;align-items:center;gap:6px;color:var(--text)}
+.tipbox .tr i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.tipbox .tr b{font-weight:700}
+
+/* ---------- plano de aula ---------- */
+.plan{display:grid;grid-template-columns:1fr 1fr;gap:28px 36px;align-items:start}
+.plan ul{margin:6px 0 0;padding-left:22px}.plan li{margin:4px 0}
+.bncc code{font:700 15px/1 var(--f-body);color:var(--blue);background:var(--white);border-radius:999px;padding:4px 10px;margin-right:6px;display:inline-block}
+.polya{grid-column:1/-1;margin-top:20px}
+.polya .ph{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+.polya .ph button{border:2px solid var(--blue);background:var(--white);color:var(--blue);border-radius:18px;padding:14px 16px;text-align:left;cursor:pointer;font:inherit}
+.polya .ph button b{display:block;font:700 19px/1.2 var(--f-body);color:inherit}
+.polya .ph button span{font-size:15px;color:var(--mut)}
+.polya .ph button[aria-pressed=true]{background:var(--blue);color:#fff}
+.polya .ph button[aria-pressed=true] span{color:rgba(255,255,255,.85)}
+.seq{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.step{background:var(--card);border-radius:20px;padding:16px;transition:opacity .25s ease,background .25s ease,transform .25s ease;min-width:0}
+.step .n{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font:800 16px/1 var(--f-title);margin-bottom:8px}
+.step h5{font:700 18px/1.2 var(--f-body);color:var(--ink);margin:0 0 4px}
+.step p{font-size:15px;line-height:1.4;margin:0}
+.step small{display:block;margin-top:8px;font:600 13px/1.3 var(--f-body);color:var(--leaf)}
+.seq.f .step{opacity:.3}
+.seq.f .step.m{opacity:1;background:#dcecf7;transform:translateY(-4px)}
+@media (max-width:960px){.plan{grid-template-columns:1fr}.seq{grid-template-columns:repeat(3,minmax(0,1fr))}.polya .ph{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.seq{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- atividade 01 (slide 13) ---------- */
+.act{display:grid;grid-template-columns:1fr 1.05fr;gap:40px;align-items:start}
+.act .big2{font:700 clamp(44px,5.6vw,76px)/1 var(--f-body);letter-spacing:-.02em;color:var(--ink);margin:0 0 8px}
+.ck{display:flex;gap:12px;width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;margin:2px 0;border-radius:12px;cursor:pointer;font:inherit;font-size:17px;line-height:1.45;color:var(--text);transition:background .15s ease}
+.ck:hover{background:#dedede}
+.ck .bx{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--blue);display:grid;place-items:center;font:800 14px/1 var(--f-title);color:var(--blue);background:var(--white)}
+.ck[aria-pressed=true] .bx{background:var(--blue);color:#fff}
+.ck[aria-pressed=true]>span:last-child{color:var(--ink)}
+.ck small{display:block;font-size:15px;color:var(--mut)}
+.ckprog{display:flex;align-items:center;gap:12px;margin:10px 0 0 52px;font:600 15px/1 var(--f-body);color:var(--ink)}
+.ckprog .bar{flex:1;height:8px;border-radius:4px;background:#d5d5d5;overflow:hidden}
+.ckprog .bar i{display:block;height:100%;width:0;background:var(--blue);transition:width .3s ease}
+.act .photo{aspect-ratio:16/10;margin-top:26px}
+@media (max-width:960px){.act{grid-template-columns:1fr}.act .right{order:-1}}
+
+/* ---------- site (slide 16) ---------- */
+.site{text-align:center}
+.site .big{font-size:clamp(56px,8vw,120px)}
+.site .cycle .serif{font-size:clamp(28px,3vw,40px)}
+.site .cta{margin-top:40px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- aplicação ---------- */
+.apps{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.app{background:var(--card-2);border-radius:28px;padding:clamp(18px,2.4vw,28px);min-width:0}
+.app h3{font:700 clamp(24px,2.4vw,30px)/1.15 var(--f-body);color:var(--ink);margin:0 0 4px}
+.app .sub{font-size:16px;color:var(--mut);margin:0 0 12px}
+.formula{display:inline-block;font:700 16px/1.3 var(--f-body);background:var(--white);color:var(--blue);border-radius:999px;padding:6px 14px;margin-bottom:10px}
+.field label{display:flex;justify-content:space-between;font:600 16px/1.2 var(--f-body);color:var(--ink);margin:10px 0 4px}
+.field output{color:var(--blue);font-variant-numeric:tabular-nums}
+.field input{width:100%;accent-color:var(--blue)}
+.outs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.outs div{background:var(--white);border-radius:16px;padding:12px 14px}
+.outs b{display:block;font:800 clamp(24px,2.4vw,32px)/1 var(--f-title);color:var(--ink);font-variant-numeric:tabular-nums}
+.outs span{font-size:14px;color:var(--mut)}
+.ask{margin-top:12px;background:var(--white);border-radius:16px;padding:12px 14px;font-size:16px}
+.ask button{margin-left:6px;padding:8px 14px;font-size:14px}
+@media (max-width:960px){.apps{grid-template-columns:1fr}}
+
+/* ---------- referências (slide 19) ---------- */
+.refs .h2{text-align:center;text-transform:uppercase;font-size:clamp(32px,4.4vw,58px)}
+.refs ol{max-width:980px;margin:30px auto 0;padding-left:0;list-style:none;counter-reset:r}
+.refs li{counter-increment:r;position:relative;padding:14px 0 14px 56px;border-bottom:1px solid #e3e3e3;font-size:18px;line-height:1.5}
+.refs li::before{content:counter(r);position:absolute;left:0;top:14px;width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font:800 15px/1 var(--f-title)}
+.draft{display:block;width:max-content;max-width:100%;margin:10px auto 0;background:#fff7c2;color:#5c4a00;border-radius:999px;padding:6px 14px;font:600 14px/1.3 var(--f-body)}
+
+/* ---------- obrigado (slide 20) ---------- */
+.thanks{min-height:clamp(640px,80vw,900px);padding-top:clamp(70px,10vw,140px)}
+.thanks h2{font:400 clamp(64px,12vw,190px)/.9 var(--f-thanks);color:var(--ink);margin:0 0 0 clamp(0px,4vw,60px);position:relative;z-index:3;letter-spacing:.01em;white-space:nowrap}
+.thanks h2 span{color:var(--blue)}
+.thanks .forest{position:absolute;left:5.5%;right:22%;bottom:-20px;top:clamp(330px,40vw,470px);border-radius:26px;overflow:hidden;border:4px solid var(--blue);border-bottom:0}
+.thanks .forest img{width:100%;height:100%;object-fit:cover}
+.thanks .earth-r{position:absolute;right:-12%;top:8%;width:min(50vw,640px);z-index:2;will-change:transform}
+.thanks .note{position:absolute;z-index:4;left:9%;bottom:clamp(40px,6vw,80px);background:rgba(255,255,255,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:18px;padding:16px 22px;max-width:min(520px,80vw)}
+.thanks .note p{margin:0;font-size:18px;color:var(--ink)}
+.thanks .note small{display:block;margin-top:8px;font-size:14px;color:var(--mut)}
+@media (max-width:760px){.thanks .earth-r{right:-30%;top:auto;bottom:120px;width:80vw}.thanks .forest{right:16px;left:16px}.thanks h2{margin:0}}
+</style>
+<style>[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="progress" aria-hidden="true"><i id="prog"></i></div>
+<nav class="sidenav" id="sidenav" aria-label="Seções"></nav>
+
+<main>
+<!-- 1 · CAPA (slide 1) -->
+<section class="hero" id="inicio" data-label="Capa">
+  <div class="dots tr" aria-hidden="true"></div><div class="dots bl" aria-hidden="true"></div>
+  <h1 style="margin:0">
+    <span class="big l1 px" data-px="-1" style="display:block">A Matemática</span>
+    <span class="big blue l2 px" data-px="1" style="display:block">do El Niño</span>
+  </h1>
+  <div class="team" aria-label="Integrantes">
+    <span>Ana Carolina</span><span><b>RA</b>: 11202021712</span>
+    <span>Camila Lourenço</span><span><b>RA</b>: 11202020794</span>
+    <span>Gabriel Matos</span><span><b>RA</b>: 11202321111</span>
+    <span>Júlia Campos</span><span><b>RA</b>: 11202421058</span>
+    <span>Kauan Franca</span><span><b>RA</b>: 11202422220</span>
+  </div>
+  <div class="water" aria-hidden="true"><svg class="waves" preserveAspectRatio="none" viewBox="0 0 1200 400"></svg></div>
+  <div class="globe" aria-hidden="true"><img class="earth spin" src="assets/earth.webp" alt="" width="900" height="884"></div>
+  <div class="glass g1">Profª. Drª.<hr><span class="s">Joelma Iamac Nomura</span></div>
+  <div class="glass g2">Práticas de Ensino<br>de Matemática III<hr><span class="s">UFABC</span></div>
+  <img class="bubble" src="assets/bubble.webp" alt="" aria-hidden="true">
+  <a class="scroll-cue" href="#problema">Role para explorar <i aria-hidden="true">↓</i></a>
+</section>
+
+<!-- 2 · RESOLUÇÃO DE PROBLEMAS (slide 2) -->
+<section class="pad prob" id="problema" data-label="Resolução de problemas">
+  <div class="dots bl" aria-hidden="true"></div>
+  <div class="wrap">
+    <h2 class="big">Resolução de problemas</h2>
+    <div class="cycle">
+      <button type="button" class="node" aria-expanded="false"><span class="serif">Dinâmica Hidrológica e Eventos Extremos</span><span class="tip">Secas recordes no Norte, cheias no Sul: os níveis dos rios sobem e descem com o clima, e isso se mede com exponencial e logaritmo.</span><span class="hint">Toque para ler</span></button>
+      <div class="torn" title="Funções periódicas"><div class="in" style="background:#000"><img src="assets/trig.webp" alt="Gráficos das funções seno, cosseno e tangente no ciclo trigonométrico" style="object-fit:contain"></div><img class="ring" src="assets/ring.webp" alt="" aria-hidden="true"></div>
+      <button type="button" class="node" aria-expanded="false"><span class="serif">A Influência do El Niño nas Bacias Hidrográficas Brasileiras</span><span class="tip">O aquecimento do Pacífico muda a chuva no Brasil. O tema liga um fenômeno real às funções que os alunos estudam.</span><span class="hint">Toque para ler</span></button>
+      <svg class="arrow" style="left:16%;top:-6%" viewBox="0 0 220 160" aria-hidden="true"><path class="draw" d="M210 40 C 140 -6, 40 10, 22 120"/><path d="M8 100 L22 124 L40 104"/></svg>
+      <svg class="arrow" style="right:15%;bottom:-8%" viewBox="0 0 220 160" aria-hidden="true"><path class="draw" d="M10 130 C 90 170, 190 130, 196 30"/><path d="M178 50 L196 26 L212 52"/></svg>
+    </div>
+    <div class="periodic">
+      <p class="eyebrow" style="text-align:center">Fenômenos periódicos</p>
+      <div class="row"><label for="per">Período do ciclo: <output id="per-o" for="per">4 anos</output></label><input type="range" id="per" min="2" max="7" step="0.5" value="4"></div>
+      <svg id="per-svg" viewBox="0 0 820 170" role="img" aria-label="Onda que representa o ciclo do El Niño ao longo de 20 anos"></svg>
+      <p class="src" style="text-align:center">O El Niño volta em intervalos irregulares de 2 a 7 anos. Mova o controle para ver quantos episódios cabem em 20 anos.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · CONTEXTUALIZAÇÃO (slide 3) -->
+<section class="band" id="contexto" data-label="Contextualização do plano">
+  <div class="dots tr" aria-hidden="true"></div><div class="dots l" aria-hidden="true"></div>
+  <h2 style="margin:0"><span class="big r1 px" data-px="-1" style="display:block">Contextualização</span><span class="big blue r2 px" data-px="1" style="display:block">do plano</span></h2>
+  <div class="water" aria-hidden="true"><svg class="waves" preserveAspectRatio="none" viewBox="0 0 1200 400"></svg></div>
+  <div class="globe"><img class="earth spin" src="assets/earth.webp" alt="" aria-hidden="true"><img class="ring" src="assets/ring.webp" alt="" aria-hidden="true"></div>
+  <img class="bubble" src="assets/bubble.webp" alt="" aria-hidden="true">
+  <div class="kicker"><b>Parte 1</b>O fenômeno e por que ele é um bom problema para a aula.</div>
+</section>
+
+<!-- 4 · O QUE É EL NIÑO (slide 4) -->
+<section class="pad" id="el-nino" data-label="O que é El Niño?">
+  <img class="leaf" data-float="1" src="assets/leaf.webp" alt="" aria-hidden="true" style="left:-60px;top:-24px;width:min(14vw,150px);transform:rotate(-30deg)">
+  <img class="leaf" data-float="-1" src="assets/leaf-blur.webp" alt="" aria-hidden="true" style="right:2%;bottom:4%;width:min(14vw,160px)">
+  <div class="dots tr" aria-hidden="true"></div>
+  <div class="wrap what">
+    <div class="intro">
+      <h2 class="h2">O que é El Niño?</h2>
+      <p class="lead">É o aquecimento anormal das águas do Pacífico equatorial. Ele muda os ventos e a chuva em boa parte do planeta, inclusive no Brasil.</p>
+      <div class="hl-list" role="group" aria-label="Justificativas do plano">
+        <button type="button" class="hl" aria-pressed="true" data-t="Secas recordes no Amazonas e cheias no Sul viram dados que os alunos medem, comparam e modelam.">mudanças climáticas e o ensino de matemática</button>
+        <button type="button" class="hl" aria-pressed="false" data-t="O aluno compreende o problema, faz um plano, executa e confere o resultado. O professor medeia e não entrega a resposta.">aprendizagem por resolução de problemas</button>
+        <button type="button" class="hl" aria-pressed="false" data-t="O fenômeno se repete a cada 2 a 7 anos, de forma irregular, e os níveis dos rios sobem e descem com ele.">aplicação dos fenômenos periódicos</button>
+      </div>
+      <p class="hl-out" id="hl-out" aria-live="polite">Secas recordes no Amazonas e cheias no Sul viram dados que os alunos medem, comparam e modelam.</p>
+    </div>
+    <div class="photo tall"><img src="assets/industry.webp" alt="Chaminés de uma indústria ao lado de uma área verde" loading="lazy"></div>
+    <div class="photo full"><img src="assets/deforest.webp" alt="Trator derrubando árvores em área de desmatamento" loading="lazy"></div>
+
+    <div class="gcard enso">
+      <div class="top"><h4>El Niño ou La Niña?</h4>
+        <div class="seg" id="enso-seg" role="group" aria-label="Fase do fenômeno"><button type="button" data-s="neu" aria-pressed="false">Neutro</button><button type="button" data-s="nino" aria-pressed="true">El Niño</button><button type="button" data-s="nina" aria-pressed="false">La Niña</button></div></div>
+      <div class="enso-grid">
+        <div class="ocean">
+          <svg viewBox="0 0 1000 470" role="img" aria-label="Corte do Oceano Pacífico equatorial com ventos, água quente e chuva">
+            <rect x="0" y="200" width="1000" height="270" fill="#d4e9f7"/>
+            <path id="thermo" class="thermo" d="M70 330 C 400 330 600 320 930 320" fill="none" stroke="#0b7fc4" stroke-width="3" stroke-dasharray="10 8"/>
+            <text x="500" y="452" text-anchor="middle" font-size="19" fill="#686868" font-family="Figtree,sans-serif">termoclina: limite entre a água quente e a fria</text>
+            <g class="cold" id="cold" style="transform-origin:870px 228px"><ellipse cx="870" cy="228" rx="110" ry="26" fill="#8ccaf0"/><text x="870" y="290" text-anchor="middle" font-size="19" font-weight="700" fill="#08679f" font-family="Figtree,sans-serif">água fria sobe</text></g>
+            <g class="warm" id="warm" style="transform-origin:0 0"><ellipse cx="0" cy="222" rx="190" ry="34" fill="#ffc63d"/><ellipse cx="0" cy="214" rx="120" ry="18" fill="#f27d26" opacity=".7"/></g>
+            <g class="cloud" id="cloud" style="transform-origin:0 0"><path d="M-70 92h140a38 38 0 0 0 0-76 55 55 0 0 0-104 14A31 31 0 0 0-70 92Z" fill="#fff" stroke="#231f20" stroke-width="2.5"/><path d="M-40 104l-8 20M0 104l-8 20M40 104l-8 20" stroke="#0b7fc4" stroke-width="4" stroke-linecap="round"/><text x="0" y="62" text-anchor="middle" font-size="19" font-weight="700" fill="#231f20" font-family="Figtree,sans-serif">chuva</text></g>
+            <g class="wind" id="wind" style="transform-origin:880px 168px"><path d="M880 168H520" stroke="#231f20" stroke-width="5" stroke-linecap="round"/><path d="M540 153l-22 15 22 15" fill="none" stroke="#231f20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+            <text id="wind-l" x="920" y="150" text-anchor="end" font-size="19" font-weight="700" fill="#231f20" font-family="Figtree,sans-serif">ventos alísios</text>
+            <rect x="0" y="190" width="70" height="280" fill="#7d9b4e"/><text x="35" y="330" font-size="18" font-weight="700" fill="#fff" text-anchor="middle" transform="rotate(-90 35 330)" font-family="Figtree,sans-serif">Indonésia · Austrália</text>
+            <rect x="930" y="190" width="70" height="280" fill="#7d9b4e"/><text x="965" y="330" font-size="18" font-weight="700" fill="#fff" text-anchor="middle" transform="rotate(90 965 330)" font-family="Figtree,sans-serif">América do Sul</text>
+            <text x="82" y="238" font-size="17" fill="#686868" font-family="Figtree,sans-serif">Oeste</text><text x="918" y="238" font-size="17" fill="#686868" text-anchor="end" font-family="Figtree,sans-serif">Leste</text>
+          </svg>
+        </div>
+        <div class="enso-panel">
+          <h5 id="enso-h">El Niño</h5>
+          <p id="enso-d"></p>
+          <div id="enso-e"></div>
+          <p class="src" id="enso-oni"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · ONI + EFEITOS (layout do slide 5) -->
+<section class="pad" id="oni" data-label="Um fenômeno que se repete">
+  <img class="leaf" data-float="1" src="assets/leaf.webp" alt="" aria-hidden="true" style="right:3%;top:30px;width:min(11vw,120px);transform:rotate(24deg)">
+  <div class="dots bl" aria-hidden="true"></div>
+  <div class="wrap oni">
+    <div>
+      <h2 class="h2">Um fenômeno que se repete</h2>
+      <p class="lead">O ONI mede quanto o Pacífico está mais quente que o normal. Acima de +0,5 °C, é El Niño. Em agosto de 2026, ele já está acima de todos os El Niños fortes recentes no mesmo mês.</p>
+      <div class="chart-card">
+        <div class="chips" id="oni-chips" role="group" aria-label="Destacar um ano"></div>
+        <div class="plot" id="oni-plot"></div>
+        <div class="kpis">
+          <div class="kpi"><div class="v b">+2,16 °C</div><div class="k">ONI de jul–set de 2026</div></div>
+          <div class="kpi"><div class="v">+0,72 °C</div><div class="k">acima da média dos outros 4 anos</div></div>
+          <div class="kpi"><div class="v">2 a 7</div><div class="k">anos entre um episódio e outro</div></div>
+        </div>
+        <p class="src">Fonte: NOAA CPC, Oceanic Niño Index. Passe o cursor ou toque no gráfico.</p>
+      </div>
+    </div>
+    <div>
+      <p class="eyebrow" style="margin-top:12px">Efeitos no Brasil · toque para abrir</p>
+      <button type="button" class="gcard btn-card" aria-expanded="true"><span class="chev" aria-hidden="true">+</span><h4>Norte: seca nos rios</h4><p>Rio Negro em Manaus: mínimas históricas de 12,70 m (2023) e 12,26 m (2024).</p><p class="more">Balbina (ONS) caiu a cerca de 11% em 2024. O recorde também reflete o aquecimento do Atlântico.</p></button>
+      <button type="button" class="gcard btn-card" aria-expanded="false"><span class="chev" aria-hidden="true">+</span><h4>Nordeste: menos água</h4><p>Sobradinho começou 2015 em 18,88% e terminou abaixo de 1%.</p><p class="more">A seca vinha de 2012 e o rio é regulado por barragens: o El Niño agravou, mas não causou sozinho.</p></button>
+      <button type="button" class="gcard btn-card" aria-expanded="false"><span class="chev" aria-hidden="true">+</span><h4>Sul: cheias</h4><p>Uruguaiana (RS) chegou a 13,58 m em julho de 1983; a cota de inundação é 8,5 m.</p><p class="more">Em out/2023 o rio passou de 9,87 m. Quase metade das inundações registradas pelo SGB ocorreu em fase de El Niño.</p></button>
+      <button type="button" class="gcard btn-card" aria-expanded="false"><span class="chev" aria-hidden="true">+</span><h4>Centro-Oeste: sinal fraco</h4><p>No Rio Paraguai (Ladário) os registros não mostram ligação clara.</p><p class="more">A maior cheia (6,64 m, 1988) e o nível mais baixo da série (2024) ocorreram com ONI neutro.</p></button>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · PLANO DE AULA (slide 7) -->
+<section class="band" id="plano-capa" data-label="Plano de aula">
+  <div class="dots tr" aria-hidden="true"></div><div class="dots l" aria-hidden="true"></div>
+  <h2 style="margin:0"><span class="big r1 px" data-px="-1" style="display:block">Plano de</span><span class="big blue r2 px" data-px="1" style="display:block">aula</span></h2>
+  <div class="water" aria-hidden="true"><svg class="waves" preserveAspectRatio="none" viewBox="0 0 1200 400"></svg></div>
+  <div class="globe"><img class="earth spin" src="assets/earth.webp" alt="" aria-hidden="true"><img class="ring" src="assets/ring.webp" alt="" aria-hidden="true"></div>
+  <img class="bubble" src="assets/bubble.webp" alt="" aria-hidden="true">
+  <div class="kicker"><b>Parte 2</b>Objetivos, habilidades da BNCC e a sequência da aula.</div>
+</section>
+
+<section class="pad" id="plano" data-label="Objetivos e sequência">
+  <img class="leaf" data-float="-1" src="assets/leaf-blur.webp" alt="" aria-hidden="true" style="left:-20px;bottom:10%;width:min(12vw,140px)">
+  <div class="dots tr" aria-hidden="true"></div>
+  <div class="wrap plan">
+    <div>
+      <h2 class="h2">Plano de aula</h2>
+      <p class="h3">Ensino Médio · funções exponenciais e logarítmicas</p>
+      <p class="lead"><b>Objetivo geral:</b> entender, com funções exponenciais e logarítmicas, como a água dos grandes rios do Brasil muda em anos de El Niño, e saber até onde essas contas valem.</p>
+      <div class="gcard"><h4>Objetivos específicos</h4><ul>
+        <li>Transformar a cota (altura na régua) em vazão, e o contrário.</li>
+        <li>Calcular em quanto tempo um reservatório perde metade da água.</li>
+        <li>Usar a escala logarítmica para ver se algo cresce em ritmo constante.</li>
+        <li>Ler o resultado como "quantas vezes" a vazão muda.</li></ul></div>
+    </div>
+    <div>
+      <div class="gcard bncc"><h4>Habilidades da BNCC</h4>
+        <p style="margin-bottom:10px"><code>EM13MAT304</code>Resolver e elaborar problemas com funções exponenciais, interpretando a variação das grandezas.</p>
+        <p><code>EM13MAT305</code>Resolver e elaborar problemas com funções logarítmicas, interpretando a variação das grandezas.</p></div>
+      <div class="gcard"><h4>Metodologia</h4><p>Resolução de problemas segundo Polya e verbos da Taxonomia de Bloom para cada atividade.</p></div>
+      <div class="gcard"><h4>Recursos</h4><p>Portal SACE, boletins hidrológicos, computadores ou celulares, planilhas eletrônicas, calculadora científica e o site do grupo.</p></div>
+    </div>
+    <div class="polya">
+      <p class="eyebrow">As etapas de Polya na aula · escolha uma etapa</p>
+      <div class="ph" id="polya" role="group" aria-label="Etapas de Polya">
+        <button type="button" data-p="1" aria-pressed="false"><b>1. Compreender</b><span>o que o problema pede</span></button>
+        <button type="button" data-p="2" aria-pressed="false"><b>2. Planejar</b><span>escolher dados e estratégia</span></button>
+        <button type="button" data-p="3" aria-pressed="false"><b>3. Executar</b><span>fazer as contas e o modelo</span></button>
+        <button type="button" data-p="4" aria-pressed="false"><b>4. Retrospecto</b><span>conferir e criticar o resultado</span></button>
+      </div>
+      <div class="seq" id="seq">
+        <div class="step" data-p="1 2"><span class="n">A</span><h5>Atividade 01</h5><p>Investigar os níveis dos rios no portal SACE e levantar uma hipótese.</p><small>Consultar · Identificar · Comparar · Organizar</small></div>
+        <div class="step" data-p="1"><span class="n">0</span><h5>Aquecimento</h5><p>Potência, logaritmo, e e ln; tutorial da calculadora.</p><small>Lembrar · Entender</small></div>
+        <div class="step" data-p="2 3"><span class="n">1</span><h5>Régua e vazão</h5><p>Ajustar a vazão do Rio Uruguai com dois registros.</p><small>Aplicar</small></div>
+        <div class="step" data-p="3"><span class="n">2</span><h5>Meia-vida</h5><p>Queda exponencial em Sobradinho e Balbina.</p><small>Aplicar · Analisar</small></div>
+        <div class="step" data-p="3 4"><span class="n">3</span><h5>Escala log</h5><p>O ONI cresce em ritmo constante?</p><small>Analisar</small></div>
+        <div class="step" data-p="4"><span class="n">4</span><h5>Desafio β</h5><p>Ligar o ONI à vazão e discutir os limites do modelo.</p><small>Avaliar · Criar</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · ATIVIDADES DO PLANO (slide 12) -->
+<section class="band" id="atividades-capa" data-label="Atividades do plano">
+  <div class="dots tr" aria-hidden="true"></div><div class="dots l" aria-hidden="true"></div>
+  <h2 style="margin:0"><span class="big r1 px" data-px="-1" style="display:block">Atividades</span><span class="big blue r2 px" data-px="1" style="display:block">do plano</span></h2>
+  <div class="water" aria-hidden="true"><svg class="waves" preserveAspectRatio="none" viewBox="0 0 1200 400"></svg></div>
+  <div class="globe"><img class="earth spin" src="assets/earth.webp" alt="" aria-hidden="true"><img class="ring" src="assets/ring.webp" alt="" aria-hidden="true"></div>
+  <img class="bubble" src="assets/bubble.webp" alt="" aria-hidden="true">
+  <div class="kicker"><b>Parte 3</b>Como os alunos coletam e organizam os dados reais dos rios.</div>
+</section>
+
+<!-- 8 · ATIVIDADE 01 (slide 13) -->
+<section class="pad" id="atividade-01" data-label="Atividade 01">
+  <img class="leaf" data-float="1" src="assets/leaf-blur.webp" alt="" aria-hidden="true" style="left:10px;top:20px;width:min(10vw,110px);transform:rotate(-20deg)">
+  <div class="dots tr" aria-hidden="true"></div><div class="dots bl" aria-hidden="true"></div>
+  <div class="wrap act">
+    <div class="left">
+      <div class="gcard"><h4>Recursos</h4><p>Portal SACE, boletins hidrológicos, computadores ou celulares, planilhas eletrônicas e calculadora. (site)</p></div>
+      <div class="gcard"><h4>Entregas</h4><p>Dados organizados, identificação dos valores máximos e mínimos, observações sobre o comportamento do rio e hipótese inicial do grupo.</p></div>
+      <div class="gcard"><h4>Atividade · marque os passos</h4>
+        <div id="ck">
+          <button type="button" class="ck" aria-pressed="false"><span class="bx">1</span><span>Acessar o portal do SGB/SACE e localizar a bacia hidrográfica atribuída ao seu grupo.</span></button>
+          <button type="button" class="ck" aria-pressed="false"><span class="bx">2</span><span>Consultar os boletins hidrológicos e selecionar dados históricos dos níveis dos rios.<small>a. Organizar os dados em uma tabela cronológica.</small></span></button>
+          <button type="button" class="ck" aria-pressed="false"><span class="bx">3</span><span>Identificar os períodos em que os níveis dos rios aumentaram ou diminuíram.</span></button>
+          <button type="button" class="ck" aria-pressed="false"><span class="bx">4</span><span>Localizar os maiores e menores valores registrados.</span></button>
+          <button type="button" class="ck" aria-pressed="false"><span class="bx">5</span><span>Comparar os dados de diferentes períodos ou anos e observar possíveis comportamentos semelhantes.</span></button>
+          <button type="button" class="ck" aria-pressed="false"><span class="bx">6</span><span>Elaborar uma hipótese: os níveis dos rios apresentam padrões de variação que podem se repetir ao longo do ano? Justifique utilizando os dados coletados.</span></button>
+        </div>
+        <div class="ckprog"><span id="ck-t">0 de 6</span><span class="bar"><i id="ck-b"></i></span></div>
+      </div>
+    </div>
+    <div class="right">
+      <h2 class="big2">Atividade 01</h2>
+      <p class="h3">Investigando o comportamento dos níveis dos rios</p>
+      <p class="em-line">Polya: compreensão do problema e elaboração do plano</p>
+      <p class="em-line">Bloom: Consultar, Identificar, Comparar, Organizar.</p>
+      <p class="lead" style="margin-top:20px"><b>Objetivo</b>: investigar os níveis dos rios ao longo do tempo, identificando possíveis padrões de variação.</p>
+      <div class="photo" style="position:relative"><img src="assets/rocks.webp" alt="Rio raso com pedras cobertas de musgo" loading="lazy"></div>
+      <img class="leaf" data-float="-1" src="assets/leaf.webp" alt="" aria-hidden="true" style="right:-10px;bottom:-30px;width:min(12vw,130px);transform:rotate(30deg)">
+    </div>
+  </div>
+</section>
+
+<!-- 9 · APRESENTAÇÃO DO SITE (slide 15/16) -->
+<section class="band" id="site-capa" data-label="Apresentação do site">
+  <div class="dots tr" aria-hidden="true"></div><div class="dots l" aria-hidden="true"></div>
+  <h2 style="margin:0"><span class="big r1 px" data-px="-1" style="display:block">Apresentação</span><span class="big blue r2 px" data-px="1" style="display:block">do site</span></h2>
+  <div class="water" aria-hidden="true"><svg class="waves" preserveAspectRatio="none" viewBox="0 0 1200 400"></svg></div>
+  <div class="globe"><img class="earth spin" src="assets/earth.webp" alt="" aria-hidden="true"><img class="ring" src="assets/ring.webp" alt="" aria-hidden="true"></div>
+  <img class="bubble" src="assets/bubble.webp" alt="" aria-hidden="true">
+  <div class="kicker"><b>Parte 4</b>O material interativo que os alunos usam na aula.</div>
+</section>
+
+<section class="pad site" id="site" data-label="Site">
+  <div class="dots tr gray" aria-hidden="true"></div><div class="dots bl gray" aria-hidden="true"></div>
+  <div class="wrap">
+    <h2 class="big">Site</h2>
+    <div class="cycle">
+      <button type="button" class="node" aria-expanded="false"><span class="serif">Claude<br>Python</span><span class="tip"><b>Python</b> organiza as séries de vazão e o ONI e calcula o β de cada rio. <b>Claude</b> ajudou a programar, revisar o design e conferir as contas.</span><span class="hint">Toque para ler</span></button>
+      <div class="torn"><div class="in"><img src="assets/code.webp" alt="Tela de computador com código" loading="lazy"></div><img class="ring" src="assets/ring.webp" alt="" aria-hidden="true"></div>
+      <button type="button" class="node" aria-expanded="false"><span class="serif">HTML</span><span class="tip">Gráficos, simuladores, a calculadora tutorial e as missões com respostas para conferir rodam no navegador, no computador ou no celular.</span><span class="hint">Toque para ler</span></button>
+      <svg class="arrow" style="left:16%;top:-6%" viewBox="0 0 220 160" aria-hidden="true"><path class="draw" d="M210 40 C 140 -6, 40 10, 22 120"/><path d="M8 100 L22 124 L40 104"/></svg>
+      <svg class="arrow" style="right:15%;bottom:-8%" viewBox="0 0 220 160" aria-hidden="true"><path class="draw" d="M10 130 C 90 170, 190 130, 196 30"/><path d="M178 50 L196 26 L212 52"/></svg>
+    </div>
+    <div class="cta"><a class="btn" id="site-link" href="https://claude.ai/artifact/3J3QnTXPfeGpPN9VixEm2W" target="_blank" rel="noopener">Abrir o site ↗</a><a class="btn ghost" href="#aplicacao">Ver a aplicação ao vivo ↓</a></div>
+  </div>
+</section>
+
+<!-- 10 · APLICAÇÃO SIMPLIFICADA (slide 17) -->
+<section class="band" id="aplicacao-capa" data-label="Aplicação simplificada">
+  <div class="dots tr" aria-hidden="true"></div><div class="dots l" aria-hidden="true"></div>
+  <h2 style="margin:0"><span class="big r1 px" data-px="-1" style="display:block">Aplicação</span><span class="big blue r2 px" data-px="1" style="display:block">simplificada</span></h2>
+  <div class="water" aria-hidden="true"><svg class="waves" preserveAspectRatio="none" viewBox="0 0 1200 400"></svg></div>
+  <div class="globe"><img class="earth spin" src="assets/earth.webp" alt="" aria-hidden="true"><img class="ring" src="assets/ring.webp" alt="" aria-hidden="true"></div>
+  <img class="bubble" src="assets/bubble.webp" alt="" aria-hidden="true">
+  <div class="kicker"><b>Parte 5</b>Duas missões resolvidas ao vivo com a turma.</div>
+</section>
+
+<section class="pad" id="aplicacao" data-label="Missões ao vivo">
+  <img class="leaf" data-float="1" src="assets/leaf.webp" alt="" aria-hidden="true" style="right:-20px;top:10px;width:min(11vw,120px);transform:rotate(40deg)">
+  <div class="dots bl" aria-hidden="true"></div>
+  <div class="wrap">
+    <h2 class="h2">Aplicação simplificada</h2>
+    <p class="lead">Mova os controles ou toque nos gráficos. Peçam para a turma chutar antes de revelar a resposta.</p>
+    <div class="apps">
+      <div class="app">
+        <h3>A régua do rio e a vazão</h3>
+        <p class="sub">Rio Uruguai em Uruguaiana (RS) · registros do SGB</p>
+        <span class="formula">Q = 10.942 · e^(0,1725·(h − 7,5))</span>
+        <div class="plot" id="m1-plot"></div>
+        <div class="field"><label for="hh">Cota na régua <output id="o-h" for="hh">9,87 m</output></label><input type="range" id="hh" min="6" max="14" step="0.01" value="9.87"></div>
+        <div class="outs" aria-live="polite"><div><b id="o-q">16.470</b><span>vazão (m³/s)</span></div><div><b id="o-s">Inundação</b><span>situação na régua</span></div></div>
+        <div class="ask">Quantos metros a cota precisa subir para a vazão dobrar? <button type="button" class="btn ghost" data-rev="ln 2 ÷ 0,1725 ≈ 4,0 m">Revelar</button></div>
+      </div>
+      <div class="app">
+        <h3>Quanto tempo um reservatório aguenta?</h3>
+        <p class="sub">Queda exponencial e meia-vida · dados do ONS</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span class="formula" style="margin:0">V = V₀ · e^(−k·t)</span>
+          <div class="seg" id="m2-case" role="group" aria-label="Reservatório"><button type="button" data-c="b" aria-pressed="true">Balbina</button><button type="button" data-c="s" aria-pressed="false">Sobradinho</button></div></div>
+        <div class="plot" id="m2-plot"></div>
+        <div class="field"><label for="m2t">Meses sem chuva <output id="m2t-o" for="m2t">6,0</output></label><input type="range" id="m2t" min="0" max="20" step="0.1" value="6"></div>
+        <div class="outs" aria-live="polite"><div><b id="m2-v">23,0%</b><span>volume útil</span></div><div><b id="m2-k">0,245</b><span>k por mês</span></div></div>
+        <div class="ask">Em quantos meses Balbina perde metade da água? <button type="button" class="btn ghost" data-rev="ln 2 ÷ 0,245 ≈ 2,8 meses">Revelar</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · REFERÊNCIAS (slide 19) -->
+<section class="pad refs" id="referencias" data-label="Referências">
+  <img class="leaf" data-float="1" src="assets/leaf.webp" alt="" aria-hidden="true" style="left:2%;top:30px;width:min(13vw,150px);transform:rotate(-10deg)">
+  <img class="leaf" data-float="-1" src="assets/leaf-blur.webp" alt="" aria-hidden="true" style="right:2%;bottom:20px;width:min(12vw,140px)">
+  <div class="wrap">
+    <h2 class="h2">Referências bibliográficas</h2>
+    <span class="draft">Rascunho: o grupo deve conferir antes de entregar</span>
+    <ol>
+      <li>ANDERSON, L. W.; KRATHWOHL, D. R. (org.). <i>A taxonomy for learning, teaching, and assessing: a revision of Bloom's taxonomy of educational objectives</i>. New York: Longman, 2001.</li>
+      <li>BRASIL. Ministério da Educação. <i>Base Nacional Comum Curricular</i>. Brasília: MEC, 2018.</li>
+      <li>POLYA, G. <i>A arte de resolver problemas</i>: um novo aspecto do método matemático. Rio de Janeiro: Interciência, 1995.</li>
+      <li>NOAA CLIMATE PREDICTION CENTER. <i>Oceanic Niño Index (ONI)</i>. Dados até jul–set de 2026.</li>
+      <li>SERVIÇO GEOLÓGICO DO BRASIL (SGB). <i>Sistema de Alerta de Eventos Críticos (SACE)</i> e boletins hidrológicos.</li>
+      <li>OPERADOR NACIONAL DO SISTEMA ELÉTRICO (ONS). <i>Dados hidrológicos: volumes dos reservatórios</i>.</li>
+      <li>INSTITUTO NACIONAL DE METEOROLOGIA (INMET). <i>Painel El Niño 2026–2027</i>.</li>
+      <li>CAMILLONI, I.; BARROS, V. Estudo sobre as cheias do Rio Paraná e o El Niño, 2000. (completar a referência)</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 12 · OBRIGADO (slide 20) -->
+<section class="thanks" id="obrigado" data-label="Obrigado(a)!">
+  <div class="dots tr" aria-hidden="true" style="left:0;right:auto;width:55%;-webkit-mask-image:radial-gradient(ellipse at 0 0,#000 0,transparent 70%);mask-image:radial-gradient(ellipse at 0 0,#000 0,transparent 70%)"></div>
+  <h2>Obrigado<span>(A)</span>!</h2>
+  <img class="leaf" src="assets/leaf.webp" alt="" aria-hidden="true" style="left:clamp(240px,46vw,700px);top:clamp(40px,6vw,90px);width:min(13vw,150px);z-index:4;transform:rotate(-8deg)">
+  <div class="forest"><img src="assets/forest.webp" alt="Floresta de pinheiros coberta de neblina" loading="lazy"></div>
+  <img class="earth-r spin" src="assets/earth.webp" alt="" aria-hidden="true">
+  <div class="note"><p>Perguntas? Experimentem o site: as missões têm respostas para conferir na hora.</p><small>Ana Carolina · Camila Lourenço · Gabriel Matos · Júlia Campos · Kauan Franca · UFABC</small></div>
+</section>
+</main>
+
+<script>
+/* ===== utilidades ===== */
+var NS="http://www.w3.org/2000/svg";
+function fmt(n,d){return n.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function sgn(n,d){return(n>0?"+":n<0?"−":"")+fmt(Math.abs(n),d)}
+var RM=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+/* ondas dos painéis azuis */
+(function(){
+  var rows=[[60,40,260],[120,620,240],[170,60,300],[230,700,260],[280,120,220],[330,640,280],[370,300,200]],h="";
+  function wave(y,x,w){var d="M"+x+" "+y,seg=w/6;for(var i=0;i<6;i++)d+=" q "+(seg/2)+" "+(i%2?8:-8)+" "+seg+" 0";return d}
+  var g1="",g2="";rows.forEach(function(r,i){var p='<path d="'+wave(r[0],r[1],r[2])+'" fill="none" stroke="#8ccaf0" stroke-width="'+(i%2?9:7)+'" stroke-linecap="round" opacity=".85"/>';if(i%2)g2+=p;else g1+=p});
+  document.querySelectorAll("svg.waves").forEach(function(s){s.innerHTML='<g class="w">'+g1+'</g><g class="w w2">'+g2+'</g>'});
+})();
+
+/* ===== gráfico genérico com cursor e balão ===== */
+function plot(el,cfg){
+  var W0=cfg.W||640,H0=cfg.H||360,W=W0,H=H0,m=cfg.m||{l:50,r:70,t:18,b:34};
+  var svg=document.createElementNS(NS,"svg");svg.setAttribute("role","img");svg.setAttribute("aria-label",cfg.label);svg.setAttribute("tabindex","0");
+  function size(){var w=Math.round(el.clientWidth)||W0;W=Math.max(280,w);H=W<520?Math.round(Math.min(W*.85,340)):Math.round(W*H0/W0);svg.setAttribute("viewBox","0 0 "+W+" "+H)}
+  size();var tip=document.createElement("div");tip.className="tipbox";tip.hidden=true;el.appendChild(svg);el.appendChild(tip);
+  var api={cfg:cfg,hl:null,hx:null};
+  function sx(v){var x=api.cfg.x;return m.l+(v-x.min)/(x.max-x.min)*(W-m.l-m.r)}
+  function sy(v){var y=api.cfg.y;return m.t+(y.max-v)/(y.max-y.min)*(H-m.t-m.b)}
+  function ix(px){var x=api.cfg.x;return x.min+(px-m.l)/(W-m.l-m.r)*(x.max-x.min)}
+  function path(p){return p.map(function(q,i){return(i?"L":"M")+sx(q[0]).toFixed(1)+" "+sy(q[1]).toFixed(1)}).join("")}
+  api.sx=sx;api.sy=sy;
+  function render(){var c=api.cfg,h="";
+    c.y.ticks.forEach(function(t){var yy=sy(t[0]);h+='<line class="grid'+(t[2]?" zero":"")+'" x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+yy+'" y2="'+yy+'"/><text class="ax" x="'+(m.l-8)+'" y="'+(yy+4)+'" text-anchor="end">'+t[1]+'</text>'});
+    var ev=(W-m.l-m.r)/c.x.ticks.length<40?2:1;c.x.ticks.forEach(function(t,i){if(i%ev)return;h+='<text class="ax" x="'+sx(t[0])+'" y="'+(H-8)+'" text-anchor="middle">'+t[1]+'</text>'});
+    (c.refs||[]).forEach(function(r){if(r.axis==="x"){var xx=sx(r.v);h+='<line class="ref" x1="'+xx+'" x2="'+xx+'" y1="'+m.t+'" y2="'+(H-m.b)+'"/><text class="refl" x="'+(xx+5)+'" y="'+(m.t+(r.dy||12))+'">'+r.label+'</text>'}else{var yy=sy(r.v);h+='<line class="ref" x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+yy+'" y2="'+yy+'"/><text class="refl" x="'+(m.l+6)+'" y="'+(yy-6)+'">'+r.label+'</text>'}});
+    var labels=[],ser=c.series.slice().sort(function(a,b){return(a.id===api.hl||a.main?1:0)-(b.id===api.hl||b.main?1:0)});
+    ser.forEach(function(s){var on=s.id===api.hl||s.main,col=on||!c.mute?s.c:"#b9b9b9",w=on?(s.w||3):(s.w0||2);
+      if(s.area)h+='<path class="area" d="'+path(s.pts)+"L"+sx(s.pts[s.pts.length-1][0]).toFixed(1)+" "+sy(c.y.min)+"L"+sx(s.pts[0][0]).toFixed(1)+" "+sy(c.y.min)+'Z" fill="'+s.c+'"/>';
+      h+='<path d="'+path(s.pts)+'" fill="none" stroke="'+col+'" stroke-width="'+w+'" stroke-linecap="round" stroke-linejoin="round"/>';
+      if(s.end!==false){var p=s.pts[s.pts.length-1];h+='<circle cx="'+sx(p[0])+'" cy="'+sy(p[1])+'" r="'+(on?6:4)+'" fill="'+col+'" stroke="#fff" stroke-width="2"/>'}
+      if(s.n){var q=s.pts[s.pts.length-1];labels.push({y:sy(q[1]),x:sx(q[0])+10,t:s.n,b:on,c:on?s.c:null})}});
+    labels.sort(function(a,b){return a.y-b.y});for(var i=1;i<labels.length;i++)if(labels[i].y-labels[i-1].y<15)labels[i].y=labels[i-1].y+15;
+    labels.forEach(function(l){h+='<text class="dl'+(l.b?" b":"")+'" x="'+l.x+'" y="'+(l.y+4)+'"'+(l.c?' style="fill:'+l.c+'"':"")+'>'+l.t+'</text>'});
+    if(c.extra&&W>=480)h+=c.extra(api);
+    (c.marks||[]).forEach(function(k){var xx=sx(k.x),yy=sy(k.y);h+='<circle cx="'+xx+'" cy="'+yy+'" r="'+(k.r||5)+'" fill="'+(k.fill||"#fff")+'" stroke="'+k.c+'" stroke-width="2.5"/>';if(k.label)h+='<text class="mk" x="'+(xx+(k.dx||0))+'" y="'+(yy+(k.dy||-10))+'" text-anchor="'+(k.anchor||"middle")+'">'+k.label+'</text>'});
+    h+='<g class="hov"></g><rect x="'+m.l+'" y="'+m.t+'" width="'+(W-m.l-m.r)+'" height="'+(H-m.t-m.b)+'" fill="transparent" style="cursor:crosshair"/>';
+    svg.innerHTML=h;if(api.hx!=null)hover(api.hx)}
+  function snap(v){var c=api.cfg;if(c.snap){var b=c.snap[0];c.snap.forEach(function(s){if(Math.abs(s-v)<Math.abs(b-v))b=s});return b}v=Math.max(c.x.min,Math.min(c.x.max,v));return c.step?Math.round(v/c.step)*c.step:v}
+  function hover(xv){api.hx=xv;var g=svg.querySelector(".hov");if(!g)return;var xx=sx(xv),info=api.cfg.tip(xv,api),h='<line class="cross" x1="'+xx+'" x2="'+xx+'" y1="'+m.t+'" y2="'+(H-m.b)+'"/>';
+    info.pts.forEach(function(p){h+='<circle cx="'+xx+'" cy="'+sy(p.y)+'" r="5" fill="'+p.c+'" stroke="#fff" stroke-width="2"/>'});g.innerHTML=h;tip.innerHTML=info.html;tip.hidden=false;var f=xx/W;
+    if(f>.55){tip.style.left="auto";tip.style.right=((1-f)*100+2)+"%"}else{tip.style.right="auto";tip.style.left=(f*100+2)+"%"}}
+  function leave(){api.hx=null;var g=svg.querySelector(".hov");if(g)g.innerHTML="";tip.hidden=true}
+  function evx(e){var r=svg.getBoundingClientRect();return ix((e.clientX-r.left)/r.width*W)}
+  svg.addEventListener("pointermove",function(e){hover(snap(evx(e)))});
+  svg.addEventListener("pointerleave",function(e){if(e.pointerType==="mouse")leave()});
+  svg.addEventListener("pointerdown",function(e){var v=snap(evx(e));hover(v);if(api.cfg.onPick)api.cfg.onPick(v)});
+  svg.addEventListener("keydown",function(e){var c=api.cfg;if(e.key==="Escape"){leave();return}if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight")return;e.preventDefault();var d=e.key==="ArrowRight"?1:-1,cur=api.hx==null?(c.snap?c.snap[c.snap.length-1]:c.x.min):api.hx,nv;
+    if(c.snap){var i=c.snap.indexOf(cur);nv=c.snap[Math.max(0,Math.min(c.snap.length-1,i+d))]}else nv=Math.max(c.x.min,Math.min(c.x.max,+(cur+d*(c.kstep||1)).toFixed(4)));hover(nv);if(c.onPick)c.onPick(nv)});
+  svg.addEventListener("blur",leave);
+  api.render=render;render();
+  if(window.ResizeObserver){var lw=0;new ResizeObserver(function(){var w=Math.round(el.clientWidth);if(w&&Math.abs(w-lw)>2){lw=w;size();render()}}).observe(el)}
+  return api}
+function rows(r){return r.map(function(x){return'<div class="tr"><span><i style="background:'+x.c+'"></i>'+x.n+'</span><b>'+x.v+'</b></div>'}).join("")}
+
+/* ===== ONI: 2026 em azul, outros anos em cinza até serem destacados ===== */
+(function(){
+  var M=["jan","fev","mar","abr","mai","jun","jul","ago"],TRI=["DJF","JFM","FMA","MAM","AMJ","MJJ","JJA","JAS"];
+  var D={"2026":[-.39,-.21,.11,.46,.95,1.39,1.8,2.16],"2023":[-.55,-.33,-.11,.19,.46,.73,1,1.25],"2015":[.73,.65,.72,.86,1.04,1.19,1.44,1.73],"1997":[-.41,-.26,-.03,.3,.71,1.13,1.48,1.79],"1982":[-.05,.02,.07,.34,.65,.73,.78,.99]};
+  var C={"2026":"#0b7fc4","2023":"#5c9e2e","2015":"#c98a00","1997":"#7b5cd6","1982":"#d0532a"},ids=["2026","2023","2015","1997","1982"];
+  var series=ids.map(function(id){return{id:id,n:id,c:C[id],w:id==="2026"?4:3,w0:2,main:id==="2026",pts:D[id].map(function(v,i){return[i,v]})}});
+  var yt=[];for(var v=-.5;v<=2.51;v+=.5)yt.push([v,(v>0?"+":"")+fmt(v,1),Math.abs(v)<.01]);
+  var api=plot(document.getElementById("oni-plot"),{label:"ONI de janeiro a agosto de 1982, 1997, 2015, 2023 e 2026",W:640,H:360,x:{min:0,max:7,ticks:M.map(function(m,i){return[i,m]})},y:{min:-.75,max:2.6,ticks:yt},snap:[0,1,2,3,4,5,6,7],mute:true,
+    refs:[{axis:"y",v:.5,label:"limiar de El Niño"}],series:series,
+    extra:function(a){return'<text class="an" x="'+(a.sx(7)-12)+'" y="'+(a.sy(2.16)-14)+'" text-anchor="end">+2,16: o maior de agosto</text>'},
+    tip:function(x){var i=Math.round(x),r=ids.map(function(id){return{n:id,c:C[id],v:sgn(D[id][i],2)+" °C",val:D[id][i]}}).sort(function(a,b){return b.val-a.val});
+      return{html:'<div class="th">'+M[i]+" · "+TRI[i]+"</div>"+rows(r),pts:ids.map(function(id){return{y:D[id][i],c:C[id]}})}}});
+  var box=document.getElementById("oni-chips");
+  ids.slice(1).forEach(function(id){var b=document.createElement("button");b.type="button";b.className="chip";b.style.setProperty("--c",C[id]);b.setAttribute("aria-pressed","false");b.innerHTML="<i></i>Comparar com "+id;
+    b.addEventListener("click",function(){var on=b.getAttribute("aria-pressed")==="true";Array.prototype.forEach.call(box.children,function(x){x.setAttribute("aria-pressed","false")});if(!on)b.setAttribute("aria-pressed","true");api.hl=on?null:id;api.render()});box.appendChild(b)});
+})();
+
+/* ===== Missão 1 ===== */
+(function(){
+  var b=Math.log(31025/10942)/(13.54-7.5);function Q(h){return 10942*Math.exp(b*(h-7.5))}
+  var pts=[];for(var h=6;h<=14.0001;h+=.1)pts.push([+h.toFixed(2),Q(h)]);var sl=document.getElementById("hh"),xt=[];for(var i=6;i<=14;i++)xt.push([i,i+" m"]);
+  var api=plot(document.getElementById("m1-plot"),{label:"Vazão em função da cota no Rio Uruguai",W:560,H:300,m:{l:56,r:18,t:18,b:32},x:{min:6,max:14,ticks:xt},y:{min:0,max:36000,ticks:[[0,"0",1],[10000,"10 mil"],[20000,"20 mil"],[30000,"30 mil"]]},step:.01,kstep:.1,
+    refs:[{axis:"x",v:7.5,label:"alerta"},{axis:"x",v:8.5,label:"inundação",dy:28}],series:[{id:"q",c:"#0b7fc4",w:3,main:true,pts:pts,end:false,area:true}],
+    tip:function(x){return{html:'<div class="th">Cota '+fmt(x,2)+' m</div>'+rows([{n:"Vazão",c:"#0b7fc4",v:fmt(Math.round(Q(x)),0)+" m³/s"}]),pts:[{y:Q(x),c:"#0b7fc4"}]}},onPick:function(v){sl.value=v;upd()}});
+  var base=[{x:9.87,y:Q(9.87),c:"#0b7fc4",label:"out/2023",dx:-8,anchor:"end"},{x:13.58,y:30786,c:"#5c9e2e",label:"1983",dx:-10,anchor:"end"}];
+  function upd(){var h=+sl.value,q=Q(h);document.getElementById("o-h").textContent=fmt(h,2)+" m";document.getElementById("o-q").textContent=fmt(Math.round(q),0);document.getElementById("o-s").textContent=h<7.5?"Normal":h<8.5?"Alerta":"Inundação";
+    api.cfg.marks=base.concat([{x:h,y:q,c:"#231f20",fill:"#231f20",r:7}]);api.render()}
+  sl.addEventListener("input",upd);upd();
+})();
+
+/* ===== Missão 2 ===== */
+(function(){
+  var C={b:{v0:100,k:Math.log(100/11)/9,end:[9,11],lab:"fev/2024 ≈ 11%",ymax:100,yt:[[0,"0%",1],[25,"25%"],[50,"50%"],[75,"75%"],[100,"100%"]]},s:{v0:18.88,k:Math.log(18.88)/11,end:[11,1],lab:"dez/2015 < 1%",ymax:20,yt:[[0,"0%",1],[5,"5%"],[10,"10%"],[15,"15%"],[20,"20%"]]}};
+  var cs="b",sl=document.getElementById("m2t"),seg=document.getElementById("m2-case"),xt=[];for(var i=0;i<=20;i+=2)xt.push([i,String(i)]);
+  function V(c,t){return c.v0*Math.exp(-c.k*t)}
+  var api=plot(document.getElementById("m2-plot"),{label:"Queda exponencial do volume útil",W:560,H:300,m:{l:52,r:18,t:18,b:32},x:{min:0,max:20,ticks:xt},y:{min:0,max:100,ticks:C.b.yt},step:.1,kstep:.5,series:[],
+    tip:function(x){var c=C[cs];return{html:'<div class="th">Mês '+fmt(x,1)+'</div>'+rows([{n:"Volume",c:"#5c9e2e",v:fmt(V(c,x),1)+"%"}]),pts:[{y:V(c,x),c:"#5c9e2e"}]}},onPick:function(v){sl.value=v;upd()}});
+  function upd(){var c=C[cs],t=+sl.value,th=Math.log(2)/c.k,p=[];for(var x=0;x<=20.001;x+=.2)p.push([x,V(c,x)]);
+    api.cfg.y={min:0,max:c.ymax,ticks:c.yt};api.cfg.series=[{id:"v",c:"#5c9e2e",w:3,main:true,pts:p,end:false,area:true}];
+    api.cfg.refs=[{axis:"y",v:c.v0/2,label:"metade"},{axis:"x",v:th,label:"meia-vida "+fmt(th,1)+" meses"}];
+    api.cfg.marks=[{x:c.end[0],y:c.end[1],c:"#0b7fc4",fill:"#0b7fc4",label:c.lab,dx:10,anchor:"start"},{x:t,y:V(c,t),c:"#231f20",fill:"#fff",r:7}];
+    document.getElementById("m2t-o").textContent=fmt(t,1);document.getElementById("m2-v").textContent=fmt(V(c,t),1)+"%";document.getElementById("m2-k").textContent=fmt(c.k,3);api.render()}
+  sl.addEventListener("input",upd);
+  seg.addEventListener("click",function(e){var bt=e.target.closest("button");if(!bt)return;cs=bt.getAttribute("data-c");Array.prototype.forEach.call(seg.children,function(x){x.setAttribute("aria-pressed",x===bt?"true":"false")});upd()});
+  upd();
+})();
+
+/* ===== interações ===== */
+(function(){
+  // nós dos ciclos (resolução de problemas e site)
+  document.querySelectorAll(".node").forEach(function(n){n.addEventListener("click",function(){n.setAttribute("aria-expanded",n.getAttribute("aria-expanded")==="true"?"false":"true")})});
+  // destaques amarelos
+  var hl=document.querySelectorAll(".hl"),out=document.getElementById("hl-out");
+  hl.forEach(function(b){b.addEventListener("click",function(){hl.forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});out.textContent=b.getAttribute("data-t")})});
+  // cartões de efeitos
+  document.querySelectorAll(".btn-card").forEach(function(b){b.addEventListener("click",function(){b.setAttribute("aria-expanded",b.getAttribute("aria-expanded")==="true"?"false":"true")})});
+  // revelar respostas
+  document.querySelectorAll("[data-rev]").forEach(function(b){b.addEventListener("click",function(){var s=document.createElement("b");s.textContent=b.getAttribute("data-rev");s.style.color="var(--blue)";b.replaceWith(s)})});
+  // checklist
+  var cks=document.querySelectorAll("#ck .ck");
+  function ckp(){var n=document.querySelectorAll('#ck .ck[aria-pressed="true"]').length;document.getElementById("ck-t").textContent=n+" de 6";document.getElementById("ck-b").style.width=(n/6*100)+"%"}
+  cks.forEach(function(c,i){c.addEventListener("click",function(){var on=c.getAttribute("aria-pressed")==="true";c.setAttribute("aria-pressed",on?"false":"true");c.querySelector(".bx").textContent=on?String(i+1):"✓";ckp()})});
+  // Polya
+  var pb=document.getElementById("polya"),seq=document.getElementById("seq");
+  pb.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var on=b.getAttribute("aria-pressed")==="true";Array.prototype.forEach.call(pb.children,function(x){x.setAttribute("aria-pressed","false")});seq.classList.toggle("f",!on);
+    if(!on){b.setAttribute("aria-pressed","true");var p=b.getAttribute("data-p");seq.querySelectorAll(".step").forEach(function(s){s.classList.toggle("m",s.getAttribute("data-p").split(" ").indexOf(p)>=0)})}});
+  // onda periódica
+  var per=document.getElementById("per"),ps=document.getElementById("per-svg");
+  function drawPer(){var T=+per.value,W=820,H=170,m=30,h="",d="";for(var x=0;x<=W-2*m;x+=2){var yrs=x/(W-2*m)*20,y=H/2-Math.sin(2*Math.PI*yrs/T)*55;d+=(x?"L":"M")+(x+m)+" "+y.toFixed(1)}
+    h+='<line x1="'+m+'" x2="'+(W-m)+'" y1="'+H/2+'" y2="'+H/2+'" stroke="#c9c9c9"/>';
+    for(var k=0;k*T+T/4<=20;k++){var xx=m+(k*T+T/4)/20*(W-2*m);h+='<circle cx="'+xx+'" cy="'+(H/2-55)+'" r="7" fill="#0b7fc4"/>'}
+    for(var yr=0;yr<=20;yr+=5){var tx=m+yr/20*(W-2*m);h+='<text x="'+tx+'" y="'+(H-4)+'" text-anchor="middle" font-size="14" fill="#686868" font-family="Figtree,sans-serif">'+yr+(yr?"":" anos")+'</text>'}
+    h+='<path d="'+d+'" fill="none" stroke="#231f20" stroke-width="3" stroke-linecap="round"/>';
+    h+='<text x="'+(W-m)+'" y="22" text-anchor="end" font-size="15" font-weight="700" fill="#0b7fc4" font-family="Figtree,sans-serif">'+Math.floor((20-T/4)/T+1)+' episódios em 20 anos</text>';
+    ps.innerHTML=h;document.getElementById("per-o").textContent=fmt(T,T%1?1:0)+" anos"}
+  per.addEventListener("input",drawPer);drawPer();
+  // El Niño × La Niña
+  var S={
+    neu:{h:"Neutro",o:"ONI entre −0,5 e +0,5 °C",d:"Os ventos alísios sopram de leste para oeste e acumulam a água quente no oeste do Pacífico. A chuva fica sobre a Indonésia.",warm:"translate(270px,0) scaleX(1)",cloud:"translate(260px,0)",cold:1,wind:"scaleX(1)",wo:1,wl:"ventos alísios",th:"M70 380 C 400 370 600 300 930 270",e:[["Norte","neu","normal","Chuva dentro do normal"],["Nordeste","neu","normal","Chuva dentro do normal"],["Sul","neu","normal","Chuva dentro do normal"]]},
+    nino:{h:"El Niño",o:"ONI ≥ +0,5 °C",d:"Os ventos alísios enfraquecem e a água quente se espalha para o leste. A chuva acompanha a água quente.",warm:"translate(560px,0) scaleX(1.75)",cloud:"translate(620px,0)",cold:0,wind:"scaleX(.45)",wo:.45,wl:"alísios fracos",th:"M70 335 C 400 335 600 325 930 322",e:[["Norte","dry","mais seco","Rios mais baixos"],["Nordeste","dry","mais seco","Seca no semiárido"],["Sul","wet","mais úmido","Risco de cheias"]]},
+    nina:{h:"La Niña",o:"ONI ≤ −0,5 °C",d:"Os ventos alísios ficam mais fortes, empurram a água quente para o oeste e trazem mais água fria à superfície no leste.",warm:"translate(200px,0) scaleX(.8)",cloud:"translate(190px,0)",cold:1,wind:"scaleX(1.35)",wo:1,wl:"alísios fortes",th:"M70 400 C 400 390 600 290 930 240",e:[["Norte","wet","mais úmido","Mais chuva"],["Nordeste","wet","mais úmido","Mais chuva no norte da região"],["Sul","dry","mais seco","Tendência de seca"]]}};
+  var seg=document.getElementById("enso-seg"),$=function(i){return document.getElementById(i)};
+  function setS(k){var s=S[k];Array.prototype.forEach.call(seg.children,function(b){b.setAttribute("aria-pressed",b.getAttribute("data-s")===k?"true":"false")});
+    $("warm").style.transform=s.warm;$("cloud").style.transform=s.cloud;$("cold").style.opacity=s.cold;$("cold").style.transform=k==="nina"?"scale(1.3)":"scale(1)";$("wind").style.transform=s.wind;$("wind").style.opacity=s.wo;$("wind-l").textContent=s.wl;
+    $("thermo").setAttribute("d",s.th);$("thermo").style.d='path("'+s.th+'")';$("enso-h").textContent=s.h;$("enso-d").textContent=s.d;$("enso-oni").textContent=s.o;
+    $("enso-e").innerHTML=s.e.map(function(r){return'<div class="eff"><b>'+r[0]+'</b><span><span class="tagp '+r[1]+'">'+r[2]+'</span>'+r[3]+'</span></div>'}).join("")}
+  seg.addEventListener("click",function(e){var b=e.target.closest("button");if(b)setS(b.getAttribute("data-s"))});setS("nino");
+})();
+
+/* ===== rolagem: progresso, navegação lateral, títulos que deslizam, Terra que gira ===== */
+(function(){
+  var secs=[].slice.call(document.querySelectorAll("main>section")),nav=document.getElementById("sidenav"),prog=document.getElementById("prog");
+  secs.forEach(function(s){var a=document.createElement("a");a.href="#"+s.id;a.innerHTML="<span>"+s.getAttribute("data-label")+"</span>";a.setAttribute("aria-label",s.getAttribute("data-label"));nav.appendChild(a)});
+  var links=nav.children,px=[].slice.call(document.querySelectorAll(".px")),spin=[].slice.call(document.querySelectorAll(".spin")),floats=[].slice.call(document.querySelectorAll("[data-float]"));
+  floats.forEach(function(f){f.dataset.base=f.style.transform||""});
+  var ticking=false;
+  function frame(){ticking=false;var y=window.scrollY,vh=window.innerHeight,docH=document.documentElement.scrollHeight-vh;
+    prog.style.width=(docH>0?y/docH*100:0)+"%";
+    var cur=0;secs.forEach(function(s,i){if(s.offsetTop-vh*.4<=y)cur=i});Array.prototype.forEach.call(links,function(a,i){a.setAttribute("aria-current",i===cur?"true":"false")});
+    if(RM)return;
+    px.forEach(function(e){var r=e.parentNode.getBoundingClientRect();if(r.bottom<-200||r.top>vh+200)return;var p=(vh-r.top)/(vh+r.height);e.style.transform="translateX("+((p-.35)*-70*(+e.dataset.px))+"px)"});
+    spin.forEach(function(e){var r=e.getBoundingClientRect();if(r.bottom<0||r.top>vh)return;var base=e.classList.contains("earth-r")?"":"";e.style.transform="rotate("+(y*.04).toFixed(2)+"deg)"});
+    floats.forEach(function(e){var r=e.getBoundingClientRect();if(r.bottom<-100||r.top>vh+100)return;e.style.transform=e.dataset.base+" translateY("+((r.top-vh/2)*.08*(+e.dataset.float)).toFixed(1)+"px)"});
+  }
+  window.addEventListener("scroll",function(){if(!ticking){ticking=true;requestAnimationFrame(frame)}},{passive:true});
+  window.addEventListener("resize",frame);frame();
+  // setas desenhadas quando a seção aparece
+  if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("inview");io.unobserve(en.target)}})},{threshold:.3});document.querySelectorAll(".cycle").forEach(function(c){io.observe(c)})}
+  else document.querySelectorAll(".cycle").forEach(function(c){c.classList.add("inview")});
+})();
+</script>
+
+</body>
+</html>
