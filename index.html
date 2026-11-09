@@ -381,6 +381,17 @@ table.qs tr.on td.r,table.qs td.on{background:#dcecf7}
 .thanks .note{position:absolute;z-index:4;left:9%;bottom:clamp(40px,6vw,80px);background:rgba(255,255,255,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:18px;padding:16px 22px;max-width:min(520px,80vw)}
 .thanks .note p{margin:0;font-size:18px;color:var(--ink)}
 .thanks .note small{display:block;margin-top:8px;font-size:14px;color:var(--mut)}
+/* ---------- QR codes ---------- */
+.qr .h2{text-align:center}
+.qr .lead{text-align:center;margin:0 auto 34px}
+.qr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,360px));gap:28px;justify-content:center}
+.qr-card{position:relative;background:var(--card);border-radius:26px;padding:28px;text-align:center;min-width:0}
+.qr-card::before{content:"";position:absolute;left:-1px;top:-1px;width:70px;height:46px;background:var(--white);border-bottom-right-radius:24px}
+.qr-card::after{content:"";position:absolute;left:18px;top:-10px;width:34px;height:34px;border-radius:50%;background:var(--blue)}
+.qr-card img{width:100%;max-width:280px;aspect-ratio:1;margin:8px auto 16px;background:#fff;border-radius:18px;padding:12px}
+.qr-card h3{font:700 22px/1.2 var(--f-body);color:var(--blue);margin:0 0 6px}
+.qr-card a{font-size:15px;color:var(--text);word-break:break-all}
+@media (max-width:640px){.qr-grid{grid-template-columns:minmax(0,340px)}}
 @media (max-width:760px){.thanks .earth-r{right:-30%;top:auto;bottom:120px;width:80vw}.thanks .forest{right:16px;left:16px}.thanks h2{margin:0}}
 </style>
 <style>[hidden]{display:none!important}</style>
@@ -884,6 +895,21 @@ table.qs tr.on td.r,table.qs td.on{background:#dcecf7}
   <div class="forest"><img src="assets/forest.webp" alt="Floresta de pinheiros coberta de neblina" loading="lazy"></div>
   <img class="earth-r spin" src="assets/earth.webp" alt="" aria-hidden="true">
   <div class="note"><p>Perguntas? Experimentem o laboratório da função na Atividade 02.</p><small>Ana Carolina · Camila Lourenço · Gabriel Matos · Júlia Campos · Kauan Franca · UFABC</small></div>
+</section>
+
+<!-- 21 · QR CODES -->
+<section class="pad qr" id="acesse" data-label="Acesse pelo celular">
+  <img class="leaf" data-float="1" src="assets/leaf.webp" alt="" aria-hidden="true" style="left:2%;top:30px;width:min(11vw,120px);transform:rotate(-14deg)">
+  <img class="leaf" data-float="-1" src="assets/leaf-blur.webp" alt="" aria-hidden="true" style="right:2%;bottom:20px;width:min(11vw,130px)">
+  <div class="dots tr" aria-hidden="true"></div><div class="dots bl" aria-hidden="true"></div>
+  <div class="wrap">
+    <h2 class="h2">Acesse pelo celular</h2>
+    <p class="lead">Aponte a câmera para o código e explore as atividades no seu ritmo.</p>
+    <div class="qr-grid">
+      <div class="qr-card"><img src="assets/qr-apresentacao.svg" alt="QR code para a apresentação do seminário" width="280" height="280"><h3>Apresentação do seminário</h3><a href="https://kauan-franca1.github.io/seminario-el-nino/#problema">kauan-franca1.github.io/seminario-el-nino</a></div>
+      <div class="qr-card"><img src="assets/qr-site-analise.svg" alt="QR code para o site de análise do El Niño" width="280" height="280"><h3>Site: análise do El Niño</h3><a href="https://kauan-franca1.github.io/Elnino-Analise/" target="_blank" rel="noopener">kauan-franca1.github.io/Elnino-Analise</a></div>
+    </div>
+  </div>
 </section>
 </main>
 
